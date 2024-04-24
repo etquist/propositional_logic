@@ -1,6 +1,6 @@
 #include "logic_parser.h"
 
- 
+   
 
 bool logic_parser::evaluate(){
     // Save the original logic statement
@@ -11,7 +11,10 @@ bool logic_parser::evaluate(){
 
     bool escape_primed = false;
     bool exit = false;
+    bool skip_parentheses_standAlone;
     while (procStatement != "TRUE" && procStatement != "FALSE"){
+        skip_parentheses_standAlone = false;
+
         // Progress from left to right, stopping at each || or && Operator (must be double)
         for (auto it = procStatement.begin(); it != procStatement.end(); it++){
             auto it_2 = it + 1; // The next character
@@ -63,9 +66,9 @@ bool logic_parser::evaluate(){
                     // If there's a negate symbol and the remaining string is a proposition
                     prop_left = propositions.find(capturedStr_left.substr(1));
                     left = !(*prop_left).second.boolVal;
-                } else if (capturedStr_left == "TRUE") {
+                } else if (capturedStr_left == "TRUE" || capturedStr_left == "!FALSE") {
                     left = true;
-                }   else if (capturedStr_left == "FALSE") {
+                }   else if (capturedStr_left == "FALSE" || capturedStr_left == "!TRUE") {
                     left = false;
                 } else {
                     cout << "Invalid Right Proposition: " << capturedStr_left << endl;
@@ -112,9 +115,9 @@ bool logic_parser::evaluate(){
                     // If there's a negate symbol and the remaining string is a proposition
                     prop_right = propositions.find(capturedStr_right.substr(1));
                     right = !(*prop_right).second.boolVal;
-                } else if (capturedStr_right == "TRUE") {
+                } else if (capturedStr_right == "TRUE"  || capturedStr_right == "!FALSE") {
                     right = true;
-                }   else if (capturedStr_right == "FALSE") {
+                }   else if (capturedStr_right == "FALSE"  || capturedStr_right == "!TRUE") {
                     right = false;
                 } else {
                     cout << "Invalid Right Proposition: " << capturedStr_right << endl;
@@ -156,11 +159,28 @@ bool logic_parser::evaluate(){
                 
                 escape_primed = false;
 
+                skip_parentheses_standAlone = true;
+                exit = false;
+
                 break;
             }
 
+            // If we've reached here, it means we didn't find anything on the last pass.
+            if (escape_primed && it == procStatement.end()-1) {
+                exit = true;
+                break;
+            } else {
+                escape_primed = true;
+            }
+        }
+        
+        // If we condensed the statement already, don't do it again
+        if (skip_parentheses_standAlone){
+            continue;
+        }
 
-            // We didn't find any available operators to act on. Let's see if we can condense parentheses
+        // We didn't find any available operators to act on. Let's see if we can condense parentheses
+        for (auto it = procStatement.begin(); it != procStatement.end(); it++){
             if (*it == '('){
                 bool closed = false;
                 for (auto it_p = it+1; it_p != procStatement.end(); it_p++){
@@ -172,23 +192,18 @@ bool logic_parser::evaluate(){
                         procStatement.erase(it_p);
                         procStatement.erase(it);
 
+                        cout << "Removed parentheses." << endl;
+
+                        exit = false;
                         closed = true;
                         break;
                     }
                 }
                 if (closed) {break;}
             }
-
-
-            // If we've reached here, it means we didn't find anything on the last pass.
-            if (escape_primed && it == procStatement.end()-1) {
-                exit = true;
-                break;
-            } else {
-                escape_primed = true;
-            }
         }
-        
+
+
         // We've closed all the parentheses and checked for and/or's. Now check if there's any stand-alone variables
         // Query the whole statement as a variable
         bool standAlone;
@@ -200,13 +215,17 @@ bool logic_parser::evaluate(){
             // If there's a negate symbol and the remaining string is a proposition
             prop = propositions.find(procStatement.substr(1));
             standAlone = !(*prop).second.boolVal;
-        } else if (procStatement == "TRUE") {
+        } else if (procStatement == "TRUE" || procStatement == "!FALSE") {
             standAlone = true;
-        }   else if (procStatement == "FALSE") {
+        }   else if (procStatement == "FALSE" || procStatement == "!TRUE") {
             standAlone = false;
         } else {
             cout << "Invalid Stand-Alone Proposition: " << procStatement << endl;
-            continue;   // Invalid proposition
+            if (!exit){
+                exit = true; // next time around, kill it
+                continue;
+            }
+            
         }
     
         if (standAlone) {
@@ -251,6 +270,24 @@ void logic_parser::addProp(string var, double val, string comparisonType){
     newProp.comparisonType = comparisonType;
 
     propositions[var] = newProp;
+}
+
+void logic_parser::deleteProp(string var){
+    if (propositions.find(var) != propositions.end()){
+        // This is a valid propisition
+        propositions.erase(var);
+    } 
+    throw std::runtime_error("Invalid proposition.");
+}
+
+void logic_parser::updateProp(string var, double val, string comparisonType){
+    if (propositions.find(var) != propositions.end()){
+        // This is a valid propisition
+        propositions[var].val = val;
+        propositions[var].comparisonType = comparisonType;
+    } else{
+        addProp(var, val, comparisonType);
+    }
 }
 
 bool logic_parser::evalProp(string var, double val){

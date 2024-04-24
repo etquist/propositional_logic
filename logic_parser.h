@@ -3,8 +3,8 @@
 
     Written by Ethan Almquist
     April 2024
-*/ 
-
+*/  
+ 
 #ifndef INCLUDE_LOGIC_PARSER
 #define INCLUDE_LOGIC_PARSER
 
@@ -59,11 +59,18 @@ class logic_parser{
         // Set the logic_parser's statement
         void setStatement(string newStatement);
 
-        // Add a proposition to the know variables
+        // Add a proposition to the known variables
         void addProp(string var, double val, string comparisonType);
 
         // Evaluate a proposition based on the passed value
         bool evalProp(string var, double val);
+
+        // Deletes a proposition from the known variables
+        void deleteProp(string var);
+
+        // Updates the value and comparison type of the specified proposition if it exists, 
+        //      and if not a new prop is created
+        void updateProp(string var, double val, string comparisonType);
 
     private:
         
@@ -78,7 +85,6 @@ class logic_parser{
 
         // Check validity of a statement. Returns true if valid logic statement
         bool validate(string input);
-
 };
 
 
