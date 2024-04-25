@@ -58,23 +58,29 @@ bool logic_parser::evaluate(){
                 
                 cout << "Left: " << capturedStr_left << endl;
 
+                bool negate = false;
+                // See how many negate symbols we have
+                while (capturedStr_left[0] == '!'){
+                    negate = !negate;
+                    capturedStr_left = capturedStr_left.substr(1);
+                }
+
                 auto prop_left = propositions.find(capturedStr_left);
                 if (prop_left != propositions.end()){
                     // It's a proposition
                     left = (*prop_left).second.boolVal;
-                } else if (capturedStr_left[0] == '!' && propositions.find(capturedStr_left.substr(1)) != propositions.end()) {
-                    // If there's a negate symbol and the remaining string is a proposition
-                    prop_left = propositions.find(capturedStr_left.substr(1));
-                    left = !(*prop_left).second.boolVal;
-                } else if (capturedStr_left == "TRUE" || capturedStr_left == "!FALSE") {
+                } else if (capturedStr_left == "TRUE") {
                     left = true;
-                }   else if (capturedStr_left == "FALSE" || capturedStr_left == "!TRUE") {
+                }   else if (capturedStr_left == "FALSE") {
                     left = false;
                 } else {
                     cout << "Invalid Right Proposition: " << capturedStr_left << endl;
                     continue;   // Invalid proposition
                 }
                 
+                if (negate){
+                    left = !left;
+                }
 
                 // Repeat for the right side now.
 
@@ -107,21 +113,29 @@ bool logic_parser::evaluate(){
                 } 
                 cout << "Right: " << capturedStr_right << endl;
 
+                
+                negate = false;
+                // See how many negate symbols we have
+                while (capturedStr_right[0] == '!'){
+                    negate = !negate;
+                    capturedStr_right = capturedStr_right.substr(1);
+                }
+
                 auto prop_right = propositions.find(capturedStr_right);
                 if (prop_right != propositions.end()){
                     // It's a proposition
                     right = (*prop_right).second.boolVal;
-                } else if (capturedStr_right[0] == '!' && propositions.find(capturedStr_right.substr(1)) != propositions.end()) {
-                    // If there's a negate symbol and the remaining string is a proposition
-                    prop_right = propositions.find(capturedStr_right.substr(1));
-                    right = !(*prop_right).second.boolVal;
-                } else if (capturedStr_right == "TRUE"  || capturedStr_right == "!FALSE") {
+                } else if (capturedStr_right == "TRUE") {
                     right = true;
-                }   else if (capturedStr_right == "FALSE"  || capturedStr_right == "!TRUE") {
+                }   else if (capturedStr_right == "FALSE") {
                     right = false;
                 } else {
                     cout << "Invalid Right Proposition: " << capturedStr_right << endl;
                     continue;   // Invalid proposition
+                }
+
+                if (negate){
+                    right = !right;
                 }
 
 
@@ -142,6 +156,7 @@ bool logic_parser::evaluate(){
                         replacement = "FALSE";
                     }
                 }
+
 
                 // We've evaluated the proposition. Replace it in the statement
                 if (*(left_it_end-1) == '(' && *(right_it_end+1) == ')') {
@@ -207,25 +222,32 @@ bool logic_parser::evaluate(){
         // We've closed all the parentheses and checked for and/or's. Now check if there's any stand-alone variables
         // Query the whole statement as a variable
         bool standAlone;
+        
+        bool negate = false;
+        // See how many negate symbols we have
+        while (procStatement[0] == '!'){
+            negate = !negate;
+            procStatement = procStatement.substr(1);
+        }
+
         auto prop = propositions.find(procStatement);
         if (prop != propositions.end()){
             // It's a proposition
             standAlone = (*prop).second.boolVal;
-        } else if (procStatement[0] == '!' && propositions.find(procStatement.substr(1)) != propositions.end()) {
-            // If there's a negate symbol and the remaining string is a proposition
-            prop = propositions.find(procStatement.substr(1));
-            standAlone = !(*prop).second.boolVal;
-        } else if (procStatement == "TRUE" || procStatement == "!FALSE") {
+        } else if (procStatement == "TRUE") {
             standAlone = true;
-        }   else if (procStatement == "FALSE" || procStatement == "!TRUE") {
+        }   else if (procStatement == "FALSE") {
             standAlone = false;
         } else {
             cout << "Invalid Stand-Alone Proposition: " << procStatement << endl;
             if (!exit){
                 exit = true; // next time around, kill it
                 continue;
-            }
-            
+            } 
+        }
+
+        if (negate){
+            standAlone = !standAlone;
         }
     
         if (standAlone) {
