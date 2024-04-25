@@ -13,3 +13,5 @@ A sample statement could be: (A && !B) || C || !(D & B),
 This code is written in C++, and is contained in a single class: "Logic_Parser". Include "logic_parser.cpp" and "logic_parser.h" in your build to access them in your code.
 
 
+# Testing Suite
+Running the main.cpp file will test the parser over 12 different cases, including some edge cases dealing with order of operations, double negates, and stacked parentheses.
