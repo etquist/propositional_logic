@@ -76,6 +76,9 @@ class logic_parser{
         // Returns a set of all the propositions contained in the parser object
         set<string> getPropositions();
 
+        // Evaluate a proposition statement given the text statement and variable-value pairs
+        bool evaluateStandAlone(string statement, unordered_map<string, double> vars);
+
     private:
         
         // A map between a unique string, and the proposition statement
@@ -87,8 +90,13 @@ class logic_parser{
         // clear all of the spaces from the statement
         string clearSpaces(string input);
 
-        // Check validity of a statement. Returns true if valid logic statement
-        bool validate(string input);
+        // This takes a statement of the freehand form [e.g., sim!=1||((speed<=5)&&temp==5)], and replaces 
+        // values according to the map of variables passed into the string. Expressions will then be evaluated,
+        // leaving a statement of only TRUE and FALSES 
+        // NOTE: Will accept comparison operators of ["<<", "<=", ">=", ">>", "==", "!="]
+        string preParseStatement(string statement_str, unordered_map<string, double> vars);
+
+
 };
 
 

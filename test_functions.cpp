@@ -258,3 +258,48 @@ bool test_12(){
     
     return result;
 }
+
+// Expected result: true
+bool test_13(){
+    unordered_map<string, double> vars;
+    vars["speed"] = 5;
+    vars["temp"] = 5;
+    vars["waveHeight"] = 5;
+    
+    string statement = "waveHeight>=3||(speed >> 1 && temp == 5)";
+
+    logic_parser testParser;
+    bool result = testParser.evaluateStandAlone(statement, vars);
+    
+    return result;
+}
+
+// Expected result: false
+bool test_14(){
+    unordered_map<string, double> vars;
+    vars["speed"] = 5;
+    vars["temp"] = 5;
+    vars["waveHeight"] = 5;
+    
+    string statement = "(!waveHeight>=3)||!(speed >> 1 && temp == 5)";
+
+    logic_parser testParser;
+    bool result = testParser.evaluateStandAlone(statement, vars);
+    
+    return result;
+}
+
+// Expected result: true
+bool test_15(){
+    unordered_map<string, double> vars;
+    vars["speed"] = 53225;
+    vars["temp"] = -22465.235;
+    vars["waveHeight"] = 5.2356;
+    
+    string statement = "(!waveHeight>=3)||!(speed >> 1 && temp == 5)";
+
+    logic_parser testParser;
+    bool result = testParser.evaluateStandAlone(statement, vars);
+    
+    return result;
+}

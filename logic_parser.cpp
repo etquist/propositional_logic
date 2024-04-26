@@ -329,3 +329,151 @@ set<string> logic_parser::getPropositions(){
     }
     return props;
 }
+
+
+string logic_parser::preParseStatement(string statement_str, unordered_map<string, double> vars){
+    set<std::string> validOps = {"<<", "<=", ">=", ">>", "==", "!="};
+
+    // Remove whitespace
+    statement_str.erase(std::remove_if(statement_str.begin(), statement_str.end(), [](char c) { return std::isspace(static_cast<unsigned char>(c)); }), statement_str.end());
+
+    // Freehand form: e.g., sim!=1||((speed<=5)&&temp==5)
+    // First, take all of the global variables (vars) and replace them with their corresponding value
+    for (auto var : vars){
+        std::string query = var.first;
+        std::string replacement = std::to_string(var.second);   // Prep the number to be swapped in
+
+        size_t start_pos = 0;
+        while((start_pos = statement_str.find(query, start_pos)) != std::string::npos) {
+            statement_str.replace(start_pos, query.length(), replacement);
+            start_pos += replacement.length(); // Handles case where 'to' is a shorter than 'from'
+        }
+    }
+
+    // Next, search for all of the valid operators and evaluate the expressions they encompass
+    // E.g.: found: "!=" -> evaluate: sim_Val != 1, where sim_Val was replaced in the last step by the true value
+    // Evaluated expressions are replaced with TRUE or FALSE
+    for (auto op : validOps){
+        size_t start_pos = 0;
+        while((start_pos = statement_str.find(op, start_pos)) != std::string::npos){
+            cout << statement_str << endl;
+            // While we can find more of this operator
+            // the first operator is at the position "start_pos"
+
+            std::string::iterator it = statement_str.begin() + start_pos; //Set the iterator at the left character of the operator pair
+
+            bool escape = false;
+            auto left_it_start = it - 1;
+            auto left_it_end = left_it_start;
+            // First, search left. If any of [')', procStatement.begin(), '|', or '&'] are found, stop
+            // the .begin()-1 is to see if we're past the beginning character
+            for (left_it_end; left_it_end != statement_str.begin()-1; left_it_end--){
+                if (*left_it_end == ')'){
+                    left_it_end++;  // go back to the last valid position
+                    escape = true;  // We have other work to do on this left parentheses first
+
+                    std::string errorMsg = "Error: Invalid Statement; " + statement_str;
+                    throw std::runtime_error(errorMsg);
+
+                    return "Invalid String";
+                }
+
+                else if (*left_it_end == '|' || *left_it_end == '&' || *left_it_end == '(' || *left_it_end == '!') {
+                    left_it_end++;  // go back to the last valid position
+                    escape = false; // We've captured a valid statement
+                    break;
+                }
+            }
+
+            // If it's past the end, we need to scoot it up 1
+            if (left_it_end == statement_str.begin()-1){
+                left_it_end++;
+            }
+            string capturedStr_left(left_it_end, left_it_start+1); // Get the string associated with the LHS. This should be a proposition
+            if (capturedStr_left.size() == 0){
+                capturedStr_left = *left_it_end;
+            }
+            cout << "Left: " << capturedStr_left << endl;
+            double lhs = std::stod(capturedStr_left);
+            
+
+            escape = false;
+            auto right_it_start = it + 2; // Start 1 to the right of the operator pair
+            auto right_it_end = right_it_start;
+            // First, search left. If any of ['(', procStatement.begin(), '|', or '&'] are found, stop
+            for (right_it_end; right_it_end != statement_str.end(); right_it_end++){
+                if (*right_it_end == '('){
+                    right_it_end--;  // go back to the last valid position
+                    escape = true;  // We have other work to do on this right parentheses first
+                    
+                    std::string errorMsg = "Error: Invalid Statement; " + statement_str;
+                    throw std::runtime_error(errorMsg);
+
+                    return "Invalid String";
+                }
+
+                else if (*right_it_end == '|' || *right_it_end == '&' || *right_it_end == ')' || *right_it_end == '!') {
+                    right_it_end--;  // go back to the last valid position
+                    escape = false; // We've captured a valid statement
+                    break;
+                }
+            }
+
+
+            if (right_it_end == statement_str.end()){
+                right_it_end--;
+            }
+            string capturedStr_right(right_it_start, right_it_end+1); // Get the string associated with the LHS. This should be a proposition
+            if (capturedStr_right.size() == 0){
+                capturedStr_right = *right_it_end;
+            } 
+            cout << "Right: " << capturedStr_right << endl;
+            double rhs = std::stod(capturedStr_right);
+            
+            // Evaluate:
+            bool replacement;
+            if (op == "<<"){
+                replacement = lhs < rhs;
+            } else if (op == "<="){
+                replacement = lhs <= rhs;
+            } else if (op == ">="){
+                replacement = lhs >= rhs;
+            } else if (op == ">>"){
+                replacement = lhs > rhs;
+            } else if (op == "!="){
+                replacement = lhs != rhs;
+            } else if (op == "=="){
+                replacement = lhs == rhs;
+            }
+
+            string replacementStr;
+            if (replacement){
+                replacementStr = "TRUE";
+            } else {
+                replacementStr = "FALSE";
+            }
+
+            // We've evaluated the proposition. Replace it in the statement
+            if (*(left_it_end-1) == '(' && *(right_it_end+1) == ')') {
+                left_it_end--;  // We want to replace the parentheses too
+                right_it_end++;  
+            }
+            right_it_end++;
+
+            // If it's past the end, we need to scoot it up 1
+            if (left_it_end == statement_str.begin()-1){
+                left_it_end++;
+            }
+            statement_str.replace(left_it_end, right_it_end, replacementStr);
+            cout << "Updated Statement: " << statement_str << endl;
+        }
+    }
+    return statement_str;
+}
+
+
+bool logic_parser::evaluateStandAlone(string statement, unordered_map<string, double> vars){
+    string formattedStatement = preParseStatement(statement, vars);
+    setStatement(formattedStatement);
+    return evaluate();
+}

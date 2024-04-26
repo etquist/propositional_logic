@@ -8,7 +8,6 @@
  // This main.cpp script serves as a testing bed and demonstration of the parser
 
 int main(int argc, char** argv) {
-    
     cout << "\n\nTest 1: \n" << endl;
     assert(test_1() == true);
     
@@ -43,6 +42,15 @@ int main(int argc, char** argv) {
     assert(test_11() == false);
 
     cout << "\n\nTest 12 \n" << endl;
+    assert(test_12() == true);
+
+    cout << "\n\nTest 13 \n" << endl;
+    assert(test_12() == true);
+
+    cout << "\n\nTest 14 \n" << endl;
+    assert(test_12() == true);
+
+    cout << "\n\nTest 15 \n" << endl;
     assert(test_12() == true);
     
 
