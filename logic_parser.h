@@ -57,8 +57,9 @@ class logic_parser{
         // Invalid propositions throw an error and return false
         bool evaluate();
 
-        // Set the logic_parser's statement
+        // Get/Set the logic_parser's statement
         void setStatement(string newStatement);
+        string getStatement();
 
         // Add a proposition to the known variables
         void addProp(string var, double val, string comparisonType);

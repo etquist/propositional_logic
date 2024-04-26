@@ -477,3 +477,7 @@ bool logic_parser::evaluateStandAlone(string statement, unordered_map<string, do
     setStatement(formattedStatement);
     return evaluate();
 }
+
+string logic_parser::getStatement(){
+    return statement;
+}
