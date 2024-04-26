@@ -321,3 +321,11 @@ bool logic_parser::evalProp(string var, double val){
     throw std::runtime_error("Invalid proposition.");
     return false;
 }
+
+set<string> logic_parser::getPropositions(){
+    set<string> props;
+    for (auto prop : propositions){
+        props.insert(prop.first);
+    }
+    return props;
+}

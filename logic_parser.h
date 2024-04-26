@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <iostream>
 #include <cctype>
+#include <set>
 
 
 
@@ -71,6 +72,9 @@ class logic_parser{
         // Updates the value and comparison type of the specified proposition if it exists, 
         //      and if not a new prop is created
         void updateProp(string var, double val, string comparisonType);
+
+        // Returns a set of all the propositions contained in the parser object
+        set<string> getPropositions();
 
     private:
         
