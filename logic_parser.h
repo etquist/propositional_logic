@@ -18,15 +18,13 @@
 
 
 
-using namespace std;
-
 class logic_parser{
     public:
         struct prop{
             // Of the format... "var comparisonType val"
-            string var;                 // e.g., "speed"
+            std::string var;                 // e.g., "speed"
             double val;                 // e.g., "3"
-            string comparisonType;      // ["<", "<=", ">=", ">", "=", "!=""]
+            std::string comparisonType;      // ["<", "<=", ">=", ">", "=", "!=""]
 
             bool boolVal = false;   // default, false. the last evaluated value of the propositon
 
@@ -58,44 +56,44 @@ class logic_parser{
         bool evaluate();
 
         // Get/Set the logic_parser's statement
-        void setStatement(string newStatement);
-        string getStatement();
+        void setStatement(std::string newStatement);
+        std::string getStatement();
 
         // Add a proposition to the known variables
-        void addProp(string var, double val, string comparisonType);
+        void addProp(std::string var, double val, std::string comparisonType);
 
         // Evaluate a proposition based on the passed value
-        bool evalProp(string var, double val);
+        bool evalProp(std::string var, double val);
 
         // Deletes a proposition from the known variables
-        void deleteProp(string var);
+        void deleteProp(std::string var);
 
         // Updates the value and comparison type of the specified proposition if it exists, 
         //      and if not a new prop is created
-        void updateProp(string var, double val, string comparisonType);
+        void updateProp(std::string var, double val, std::string comparisonType);
 
         // Returns a set of all the propositions contained in the parser object
-        set<string> getPropositions();
+        std::set<std::string> getPropositions();
 
         // Evaluate a proposition statement given the text statement and variable-value pairs
-        bool evaluateStandAlone(string statement, unordered_map<string, double> vars);
+        bool evaluateStandAlone(std::string statement, std::unordered_map<std::string, double> vars);
 
     private:
         
         // A map between a unique string, and the proposition statement
-        unordered_map<string, prop> propositions;
+        std::unordered_map<std::string, prop> propositions;
         
         // Logic statement written by the user
-        string statement;
+        std::string statement;
 
         // clear all of the spaces from the statement
-        string clearSpaces(string input);
+        std::string clearSpaces(std::string input);
 
         // This takes a statement of the freehand form [e.g., sim!=1||((speed<=5)&&temp==5)], and replaces 
         // values according to the map of variables passed into the string. Expressions will then be evaluated,
         // leaving a statement of only TRUE and FALSES 
         // NOTE: Will accept comparison operators of ["<<", "<=", ">=", ">>", "==", "!="]
-        string preParseStatement(string statement_str, unordered_map<string, double> vars);
+        std::string preParseStatement(std::string statement_str, std::unordered_map<std::string, double> vars);
 
 
 };

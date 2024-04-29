@@ -5,8 +5,8 @@
 bool logic_parser::evaluate(){
     // Save the original logic statement
     // Remove spaces from the statement
-    const string originalStatement = clearSpaces(statement);
-    string procStatement = originalStatement;
+    const std::string originalStatement = clearSpaces(statement);
+    std::string procStatement = originalStatement;
 
 
     bool escape_primed = false;
@@ -51,12 +51,12 @@ bool logic_parser::evaluate(){
                 if (left_it_end == procStatement.begin()-1){
                     left_it_end++;
                 }
-                string capturedStr_left(left_it_end, left_it_start+1); // Get the string associated with the LHS. This should be a proposition
+                std::string capturedStr_left(left_it_end, left_it_start+1); // Get the string associated with the LHS. This should be a proposition
                 if (capturedStr_left.size() == 0){
                     capturedStr_left = *left_it_end;
                 } 
                 
-                cout << "Left: " << capturedStr_left << endl;
+                std::cout << "Left: " << capturedStr_left << std::endl;
 
                 bool negate = false;
                 // See how many negate symbols we have
@@ -74,7 +74,7 @@ bool logic_parser::evaluate(){
                 }   else if (capturedStr_left == "FALSE") {
                     left = false;
                 } else {
-                    cout << "Invalid Right Proposition: " << capturedStr_left << endl;
+                    std::cout << "Invalid Right Proposition: " << capturedStr_left << std::endl;
                     continue;   // Invalid proposition
                 }
                 
@@ -107,11 +107,11 @@ bool logic_parser::evaluate(){
                 if (right_it_end == procStatement.end()){
                     right_it_end--;
                 }
-                string capturedStr_right(right_it_start, right_it_end+1); // Get the string associated with the LHS. This should be a proposition
+                std::string capturedStr_right(right_it_start, right_it_end+1); // Get the string associated with the LHS. This should be a proposition
                 if (capturedStr_right.size() == 0){
                     capturedStr_right = *right_it_end;
                 } 
-                cout << "Right: " << capturedStr_right << endl;
+                std::cout << "Right: " << capturedStr_right << std::endl;
 
                 
                 negate = false;
@@ -130,7 +130,7 @@ bool logic_parser::evaluate(){
                 }   else if (capturedStr_right == "FALSE") {
                     right = false;
                 } else {
-                    cout << "Invalid Right Proposition: " << capturedStr_right << endl;
+                    std::cout << "Invalid Right Proposition: " << capturedStr_right << std::endl;
                     continue;   // Invalid proposition
                 }
 
@@ -140,7 +140,7 @@ bool logic_parser::evaluate(){
 
 
                 // We now have two valid propositions, connected by an AND or OR operator
-                string replacement;
+                std::string replacement;
                 if (*it == '&'){
                     // It's an AND
                     if (left && right){
@@ -170,7 +170,7 @@ bool logic_parser::evaluate(){
                     left_it_end++;
                 }
                 procStatement.replace(left_it_end, right_it_end, replacement);
-                cout << "Updated Statement: " << procStatement << endl;
+                std::cout << "Updated Statement: " << procStatement << std::endl;
                 
                 escape_primed = false;
 
@@ -207,7 +207,7 @@ bool logic_parser::evaluate(){
                         procStatement.erase(it_p);
                         procStatement.erase(it);
 
-                        cout << "Removed parentheses." << endl;
+                        std::cout << "Removed parentheses." << std::endl;
 
                         exit = false;
                         closed = true;
@@ -239,7 +239,7 @@ bool logic_parser::evaluate(){
         }   else if (procStatement == "FALSE") {
             standAlone = false;
         } else {
-            cout << "Invalid Stand-Alone Proposition: " << procStatement << endl;
+            std::cout << "Invalid Stand-Alone Proposition: " << procStatement << std::endl;
             if (!exit){
                 exit = true; // next time around, kill it
                 continue;
@@ -276,16 +276,16 @@ bool logic_parser::evaluate(){
 }
 
 
-string logic_parser::clearSpaces(string input){
+std::string logic_parser::clearSpaces(std::string input){
     input.erase(std::remove_if(input.begin(), input.end(), [](char c) { return std::isspace(static_cast<unsigned char>(c)); }), input.end());
     return input;
 }
 
-void logic_parser::setStatement(string newStatement){
+void logic_parser::setStatement(std::string newStatement){
     statement = newStatement;
 }
 
-void logic_parser::addProp(string var, double val, string comparisonType){
+void logic_parser::addProp(std::string var, double val, std::string comparisonType){
     prop newProp;
     newProp.var = var;
     newProp.val = val;
@@ -294,7 +294,7 @@ void logic_parser::addProp(string var, double val, string comparisonType){
     propositions[var] = newProp;
 }
 
-void logic_parser::deleteProp(string var){
+void logic_parser::deleteProp(std::string var){
     if (propositions.find(var) != propositions.end()){
         // This is a valid propisition
         propositions.erase(var);
@@ -302,7 +302,7 @@ void logic_parser::deleteProp(string var){
     throw std::runtime_error("Invalid proposition.");
 }
 
-void logic_parser::updateProp(string var, double val, string comparisonType){
+void logic_parser::updateProp(std::string var, double val, std::string comparisonType){
     if (propositions.find(var) != propositions.end()){
         // This is a valid propisition
         propositions[var].val = val;
@@ -312,7 +312,7 @@ void logic_parser::updateProp(string var, double val, string comparisonType){
     }
 }
 
-bool logic_parser::evalProp(string var, double val){
+bool logic_parser::evalProp(std::string var, double val){
     if (propositions.find(var) != propositions.end()){
         // This is a valid propisition
         return propositions[var].eval(val);
@@ -322,8 +322,8 @@ bool logic_parser::evalProp(string var, double val){
     return false;
 }
 
-set<string> logic_parser::getPropositions(){
-    set<string> props;
+std::set<std::string> logic_parser::getPropositions(){
+    std::set<std::string> props;
     for (auto prop : propositions){
         props.insert(prop.first);
     }
@@ -331,8 +331,8 @@ set<string> logic_parser::getPropositions(){
 }
 
 
-string logic_parser::preParseStatement(string statement_str, unordered_map<string, double> vars){
-    set<std::string> validOps = {"<<", "<=", ">=", ">>", "==", "!="};
+std::string logic_parser::preParseStatement(std::string statement_str, std::unordered_map<std::string, double> vars){
+    std::set<std::string> validOps = {"<<", "<=", ">=", ">>", "==", "!="};
 
     // Remove whitespace
     statement_str.erase(std::remove_if(statement_str.begin(), statement_str.end(), [](char c) { return std::isspace(static_cast<unsigned char>(c)); }), statement_str.end());
@@ -356,7 +356,7 @@ string logic_parser::preParseStatement(string statement_str, unordered_map<strin
     for (auto op : validOps){
         size_t start_pos = 0;
         while((start_pos = statement_str.find(op, start_pos)) != std::string::npos){
-            cout << statement_str << endl;
+            std::cout << statement_str << std::endl;
             // While we can find more of this operator
             // the first operator is at the position "start_pos"
 
@@ -389,11 +389,11 @@ string logic_parser::preParseStatement(string statement_str, unordered_map<strin
             if (left_it_end == statement_str.begin()-1){
                 left_it_end++;
             }
-            string capturedStr_left(left_it_end, left_it_start+1); // Get the string associated with the LHS. This should be a proposition
+            std::string capturedStr_left(left_it_end, left_it_start+1); // Get the string associated with the LHS. This should be a proposition
             if (capturedStr_left.size() == 0){
                 capturedStr_left = *left_it_end;
             }
-            cout << "Left: " << capturedStr_left << endl;
+            std::cout << "Left: " << capturedStr_left << std::endl;
             double lhs = std::stod(capturedStr_left);
             
 
@@ -423,11 +423,11 @@ string logic_parser::preParseStatement(string statement_str, unordered_map<strin
             if (right_it_end == statement_str.end()){
                 right_it_end--;
             }
-            string capturedStr_right(right_it_start, right_it_end+1); // Get the string associated with the LHS. This should be a proposition
+            std::string capturedStr_right(right_it_start, right_it_end+1); // Get the string associated with the LHS. This should be a proposition
             if (capturedStr_right.size() == 0){
                 capturedStr_right = *right_it_end;
             } 
-            cout << "Right: " << capturedStr_right << endl;
+            std::cout << "Right: " << capturedStr_right << std::endl;
             double rhs = std::stod(capturedStr_right);
             
             // Evaluate:
@@ -446,7 +446,7 @@ string logic_parser::preParseStatement(string statement_str, unordered_map<strin
                 replacement = lhs == rhs;
             }
 
-            string replacementStr;
+            std::string replacementStr;
             if (replacement){
                 replacementStr = "TRUE";
             } else {
@@ -465,19 +465,19 @@ string logic_parser::preParseStatement(string statement_str, unordered_map<strin
                 left_it_end++;
             }
             statement_str.replace(left_it_end, right_it_end, replacementStr);
-            cout << "Updated Statement: " << statement_str << endl;
+            std::cout << "Updated Statement: " << statement_str << std::endl;
         }
     }
     return statement_str;
 }
 
 
-bool logic_parser::evaluateStandAlone(string statement, unordered_map<string, double> vars){
-    string formattedStatement = preParseStatement(statement, vars);
+bool logic_parser::evaluateStandAlone(std::string statement, std::unordered_map<std::string, double> vars){
+    std::string formattedStatement = preParseStatement(statement, vars);
     setStatement(formattedStatement);
     return evaluate();
 }
 
-string logic_parser::getStatement(){
+std::string logic_parser::getStatement(){
     return statement;
 }
