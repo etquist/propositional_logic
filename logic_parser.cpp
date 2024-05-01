@@ -269,7 +269,10 @@ bool logic_parser::evaluate(){
     // Now return the corresponding value to the string
     if (procStatement == "TRUE"){
         return true;
+    } else if (procStatement == "FALSE") {
+        return false;
     } else {
+        throw std::runtime_error("Invalid proposition.");   // Throw an error if we couldn't fully evaluate it.
         return false;
     }
     

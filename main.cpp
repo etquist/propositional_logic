@@ -4,6 +4,8 @@
 #include <cassert>
 #include "logic_parser.h"
 #include "test_functions.cpp"
+
+using namespace std;    // just for the main file
   
  // This main.cpp script serves as a testing bed and demonstration of the parser
 

@@ -1,6 +1,8 @@
 #include "logic_parser.h"
 #include <string>
 
+using namespace std;
+
 // Expected result: true
 bool test_1(){
     logic_parser testParser;
