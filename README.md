@@ -10,7 +10,7 @@ A sample statement could be: (A && !B) || C || !(D && B),
   which, after defining the values of A, B, C, and D, can be reduced to a single true or false boolean.
 
 By using the preparser, this statement could be (speed << 5 && !temp >> 67) || waveHeight <= 3 || !(status == 1 && temp >> 67),
-  which could be solved when passed with a map of {speed : 4, temp : 65, waveHeight : 7, status : 1};
+  which could be solved when passed with a map of {speed : 4, temp : 65, waveHeight : 7, status : 1}.
 
 
 # Installation Instructions
