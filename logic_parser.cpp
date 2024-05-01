@@ -250,10 +250,10 @@ bool logic_parser::evaluate(){
             standAlone = !standAlone;
         }
     
-        if (standAlone) {
+        if (standAlone && !exit) {
             procStatement = "TRUE";
             break;
-        } else {
+        } else if (!standAlone && !exit){
             procStatement = "FALSE";
             break;
         }
